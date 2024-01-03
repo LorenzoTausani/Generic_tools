@@ -12,6 +12,19 @@ def extract_numbers(input_string: str) -> str:
     """
     return ''.join(char for char in input_string if char.isdigit())
 
+def contains_numeric_characters(s: str) -> bool:
+    """
+    Check if the given string contains at least one numeric (digit) character.
+
+    Parameters:
+    - s (str): The input string to check.
+
+    Returns:
+    - bool: True if the string contains at least one numeric character, False otherwise.
+    """
+    return any(char.isdigit() for char in s)
+
+
 def standard_format_string(input_string: str) -> str:
     """
     Formatta una stringa con la prima lettera maiuscola e sostituisce gli spazi con underscore.
