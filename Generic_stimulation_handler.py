@@ -21,7 +21,9 @@ class stimulation_data:
         self.path = path
         self.Stim_var = Stim_var
         self.Time_var = Time_var
-        self.get_stim_data()
+        Stim_dfs, StimVecs, len_phys_recordings = self.get_stim_data()
+        return Stim_dfs, StimVecs, len_phys_recordings
+
 
     def Stim_var_rename(self, stimulation_df: pd.DataFrame) -> pd.DataFrame:
         """

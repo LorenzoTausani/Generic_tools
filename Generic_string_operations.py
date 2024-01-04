@@ -1,4 +1,5 @@
 from typing import Any, Union
+import re
 
 def extract_numbers(input_string: str) -> str:
     """
@@ -22,7 +23,21 @@ def contains_numeric_characters(s: str) -> bool:
     Returns:
     - bool: True if the string contains at least one numeric character, False otherwise.
     """
+    #ALTERNATIVA CON REGULAR EXPRESSION: bool(re.search(r'\d+', string)) #\d corrisponde a qualsiasi cifra da 0 a 9; è un quantificatore che indica "uno o più" occorrenze del carattere precedente. Quindi, \d+ indica una sequenza di uno o più caratteri numerici.
     return any(char.isdigit() for char in s)
+
+def exclude_chars(string: str, pattern: str) -> str:
+    """
+    Remove specified pattern from the input string.
+
+    Parameters:
+    - string (str): The input string.
+    - pattern (str): The pattern to be excluded.
+
+    Returns:
+    - str: The string after removing the specified pattern.
+    """
+    return re.sub(pattern, '', string)
 
 
 def standard_format_string(input_string: str) -> str:
