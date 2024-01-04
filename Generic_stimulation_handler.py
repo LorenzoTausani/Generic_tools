@@ -47,7 +47,7 @@ class stimulation_data:
         Returns:
         - StimVec (np.ndarray): Vettore di stimoli.
         """
-        stimulation_df = self.Stim_var_rename(self,stimulation_df)
+        stimulation_df = self.Stim_var_rename(stimulation_df)
         StimVec = np.empty(stimulation_df[self.Time_var].max(), dtype=object) # Crea un array vuoto per il vettore di stimoli
 
         # Itera sul DataFrame e assegna il tipo di stimolo a ogni unità di tempo
