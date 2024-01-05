@@ -99,15 +99,16 @@ class stimulation_data:
         self.len_phys_recordings = len_phys_recordings
         return Stim_dfs, StimVecs, len_phys_recordings
 
-def cut_recording(StimVec,Stim_df, physRecordingMatrix, df_Time_var, do_custom_cutting = False):
+def cut_recording(StimVec,Stim_df, physRecordingMatrices, df_Time_var, do_custom_cutting = False):
   cut = len(StimVec)
   if do_custom_cutting:
-    plt.plot(np.mean(physRecordingMatrix,axis = 0))
+    plt.plot(np.mean(physRecordingMatrices[0],axis = 0))
     # Show the plot
     plt.show()
     plt.pause(0.1)
-    cut = int(input('at which frame you want to cut the series (all = ' +str(len(StimVec))+ ')?'))
+    cut = int(input('At which frame you want to cut the recording (include all = ' +str(len(StimVec))+ ')?'))
     StimVec = StimVec[:cut]
     Stim_df = Stim_df[Stim_df[df_Time_var]<cut] #taglia fuori END? da controllare
-  physRecordingMatrix = physRecordingMatrix[:,:cut]
-  return StimVec, Stim_df, physRecordingMatrix
+  for i,phyR in enumerate(physRecordingMatrices):
+    physRecordingMatrices[i] = phyR[:,:cut]
+  return StimVec, Stim_df, physRecordingMatrices
