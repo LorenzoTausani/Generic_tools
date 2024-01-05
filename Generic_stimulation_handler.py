@@ -72,7 +72,7 @@ class stimulation_data:
         Returns:
         - len_phys_recording (Union[int, float]): Lunghezza della registrazione fisica.
         """
-        return stimulation_df[self.Time_var][-1]
+        return [stimulation_df[self.Time_var][-1]]
 
     def get_stim_data(self) -> Tuple[List[pd.DataFrame], List[np.ndarray], List[Union[int, float]]]:
        
@@ -88,11 +88,10 @@ class stimulation_data:
         excel_files = find_files_by_extension(directory = self.path, extension='.xlsx', recursive = False)
         Stim_dfs = []
         StimVecs = []
-        len_phys_recordings = []
         for n,ex_f in enumerate(excel_files): #multipli file excel sono considerati in caso di trattamento nella stessa sessione sperimentale (pre-post treatment). L'ordinamento di questi files va sviluppato
          Stim_dfs.append(pd.read_excel(ex_f))
          StimVecs.append(self.get_StimVec(Stim_dfs[n]))
-         len_phys_recordings.append(self.get_len_phys_recording(Stim_dfs[n]))
+        len_phys_recordings = self.get_len_phys_recording(Stim_dfs[n])
        
         self.Stim_dfs = Stim_dfs
         self.StimVecs = StimVecs
