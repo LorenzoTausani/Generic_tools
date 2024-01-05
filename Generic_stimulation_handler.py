@@ -62,7 +62,7 @@ class stimulation_data:
             prec_row = row
         return StimVec
     
-    def get_len_phys_recording(self, stimulation_df: pd.DataFrame) -> Union[int, float]:
+    def get_len_phys_recording(self, stimulation_df: pd.DataFrame) -> List[Union[int, float]]: #controlla per dati diversi da Fluorescenza 2p
         """
         Ottieni la lunghezza della registrazione fisiologica dai dati di stimolazione.
 
@@ -70,7 +70,7 @@ class stimulation_data:
         - stimulation_df (pd.DataFrame): DataFrame contenente i dati di stimolazione.
 
         Returns:
-        - len_phys_recording (Union[int, float]): Lunghezza della registrazione fisica.
+        - len_phys_recording (List[Union[int, float]]): Lunghezza della registrazione fisica.
         """
         return [stimulation_df[self.Time_var][-1]]
 
