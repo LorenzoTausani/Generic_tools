@@ -98,6 +98,32 @@ class stimulation_data:
         self.StimVecs = StimVecs
         self.len_phys_recordings = len_phys_recordings
         return Stim_dfs, StimVecs, len_phys_recordings
+    
+    def create_logical_dict(self, idx, change_existing_dict_files=True): #mettere anche *args e **kwargs?
+      session_name = self.session_name; Stim_var = self.Stim_var
+      StimVec = self.StimVecs[idx]; df = self.Stim_dfs[idx]
+      stim_names = df[Stim_var].unique()
+      logical_dict_filename = session_name+'_logical_dict.npz'; 
+      if not(os.path.isfile(logical_dict_filename)) or change_existing_dict_files==True:
+          logical_dict ={}
+          for stim in stim_names:
+            if stim != 'END':
+                stimTrue =StimVec==stim # Definisci il vettore booleano di True e False
+                stimTrue_01 = ''.join('1' if x else '0' for x in stimTrue) # Converti il vettore booleano in una stringa di 0 e 1
+                # Trova tutte le sequenze di 1 consecutive nella stringa e calcola la loro lunghezza
+                stimTrue_begin_end = [(match.start(), match.end()) for match in re.finditer('1+', stimTrue_01)]
+                logical_dict[str(stim)] = np.array(stimTrue_begin_end) 
+
+          if hasattr(self, 'add_keys_logicalDict') and callable(getattr(self, 'add_keys_logicalDict')):
+            logical_dict = self.add_keys_logicalDict(logical_dict)
+          np.savez(logical_dict_filename, **logical_dict)
+      else:
+          logical_dict = np.load(logical_dict_filename)
+      if not(hasattr(self, 'logical_dict')):
+        self.logical_dict = [logical_dict]
+      else:
+         self.logical_dict.append(logical_dict)
+      return logical_dict 
 
 def cut_recording(StimVec,Stim_df, physRecordingMatrices, df_Time_var, do_custom_cutting = False):
   cut = len(StimVec)
@@ -112,3 +138,5 @@ def cut_recording(StimVec,Stim_df, physRecordingMatrices, df_Time_var, do_custom
   for i,phyR in enumerate(physRecordingMatrices):
     physRecordingMatrices[i] = phyR[:,:cut]
   return StimVec, Stim_df, physRecordingMatrices
+
+               
