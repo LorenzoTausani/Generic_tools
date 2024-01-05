@@ -13,18 +13,18 @@ def extract_numbers(input_string: str) -> str:
     """
     return ''.join(char for char in input_string if char.isdigit())
 
-def contains_numeric_characters(s: str) -> bool:
+def contains_character(s: str, pattern: str) -> bool:
     """
-    Check if the given string contains at least one numeric (digit) character.
+    Check if the given string contains at least one character that matches the specified pattern.
 
     Parameters:
     - s (str): The input string to check.
+    - pattern (str): The pattern of characters to look for.
 
     Returns:
-    - bool: True if the string contains at least one numeric character, False otherwise.
+    - bool: True if the string contains at least one character matching the specified pattern, False otherwise.
     """
-    #ALTERNATIVA CON REGULAR EXPRESSION: bool(re.search(r'\d+', string)) #\d corrisponde a qualsiasi cifra da 0 a 9; è un quantificatore che indica "uno o più" occorrenze del carattere precedente. Quindi, \d+ indica una sequenza di uno o più caratteri numerici.
-    return any(char.isdigit() for char in s)
+    return bool(re.search(pattern, s))
 
 def exclude_chars(string: str, pattern: str) -> str:
     """
