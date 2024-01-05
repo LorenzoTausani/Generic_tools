@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import mode
 from typing import List, Tuple, Union, Optional, Dict, Any
 import matplotlib.pyplot as plt
 
@@ -133,6 +134,37 @@ class stimulation_data:
       else:
          self.logical_dict.append(logical_dict)
       return logical_dict 
+    
+
+    def get_stim_phys_recording(self, stim_name: str, phys_recording: np.ndarray, correct_stim_duration: Union[str, int] = 'mode', idx_logical_dict: int = 0) -> np.ndarray:
+      """
+      Retrieves the physiological recordings corresponding to each occurrence of a stimulus.
+
+      Parameters:
+      - stim_name (str): The name of the stimulus.
+      - phys_recording (np.ndarray): Array of physiological recordings.
+      - correct_stim_duration (Union[str, int], optional):
+          The desired duration of the stimulus. 'mode' to use mode of durations, or an integer value. Default is 'mode'.
+      - idx_logical_dict (int, optional):
+        useful in case of multiple logical dicts present. Set to 0 for single sessions
+
+      Returns:
+      np.ndarray: Array containing the stimulus' physiological recordings.
+      """
+      stimTrue_begin_end = self.logical_dict[idx_logical_dict][stim_name], stim_durations = stimTrue_begin_end[:, 1] - stimTrue_begin_end[:, 0]
+      if correct_stim_duration == 'mode':
+        correct_stim_duration = int(mode(stim_durations)[0]) #si assume che la moda delle durate sia la durata normale dello stimolo
+      else:
+        correct_stim_duration = int(correct_stim_duration) 
+        
+      stim_phys_recordings = np.full((stimTrue_begin_end.shape[0], phys_recording.shape[0],correct_stim_duration), np.nan)
+      for i, stim_event_beg_end in enumerate(stimTrue_begin_end):
+        Sev_begin = stim_event_beg_end[0]
+        is_duration_correct = np.abs(stim_durations[i]-correct_stim_duration)< correct_stim_duration/10 #criterio arbitrario
+        is_phys_registered = phys_recording.shape[1] >= stimTrue_begin_end[i, 1] #l'evento è stato registrato per intero fisiologicamente
+        if is_duration_correct and is_phys_registered:
+           stim_phys_recordings[i,:,:] = phys_recording[:,Sev_begin:Sev_begin+correct_stim_duration]
+      return stim_phys_recordings
 
 def cut_recording(StimVec: np.ndarray,Stim_df: pd.DataFrame, physRecordingMatrices: List[np.ndarray], df_Time_var: str, 
                   do_custom_cutting: Optional[bool] = False) -> Tuple[np.ndarray, pd.DataFrame, List[np.ndarray]]:
