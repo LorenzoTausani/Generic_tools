@@ -99,7 +99,7 @@ class stimulation_data:
         return Stim_dfs, StimVecs, len_phys_recordings
     
     def create_logical_dict(self, idx, change_existing_dict_files=True): #mettere anche *args e **kwargs?
-      session_name = self.session_name; Stim_var = self.Stim_var
+      session_name = self.path; Stim_var = self.Stim_var
       StimVec = self.StimVecs[idx]; df = self.Stim_dfs[idx]
       stim_names = df[Stim_var].unique()
       logical_dict_filename = session_name+'_logical_dict.npz'; 
