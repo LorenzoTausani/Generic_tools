@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional, Dict, Any
 import matplotlib.pyplot as plt
 
 from Generic_foldering_operations import *
@@ -98,7 +98,17 @@ class stimulation_data:
         self.len_phys_recordings = len_phys_recordings
         return Stim_dfs, StimVecs, len_phys_recordings
     
-    def create_logical_dict(self, idx, change_existing_dict_files=True): #mettere anche *args e **kwargs?
+    def create_logical_dict(self, idx: int, change_existing_dict_files: bool=True)-> Dict[str, Any]: #mettere anche *args e **kwargs?
+      """
+      Create a logical dictionary containing the timings on each stimulus type.
+
+      Parameters:
+      - idx (int): Index specifying which StimVec and Stim_df to use.
+      - change_existing_dict_files (bool, optional): Flag to change existing dictionary files. Default is True.
+
+      Returns:
+      Dict[str, Any]: The logical dictionary containing information about stimuli timings.
+      """
       session_name = self.path; Stim_var = self.Stim_var
       StimVec = self.StimVecs[idx]; df = self.Stim_dfs[idx]
       stim_names = df[Stim_var].unique()
@@ -124,7 +134,22 @@ class stimulation_data:
          self.logical_dict.append(logical_dict)
       return logical_dict 
 
-def cut_recording(StimVec,Stim_df, physRecordingMatrices, df_Time_var, do_custom_cutting = False):
+def cut_recording(StimVec: np.ndarray,Stim_df: pd.DataFrame, physRecordingMatrices: List[np.ndarray], df_Time_var: str, 
+                  do_custom_cutting: Optional[bool] = False) -> Tuple[np.ndarray, pd.DataFrame, List[np.ndarray]]:
+  """
+  Cut the recording data based on custom cutting.
+
+  Parameters:
+  - StimVec (np.ndarray): The vector representing stimuli in each timebin.
+  - Stim_df (pd.DataFrame): DataFrame containing stimuli and time related information.
+  - physRecordingMatrices (List[np.ndarray]): List of matrices containing physiological recording data.
+  - df_Time_var (str): Column name representing time variable in Stim_df.
+  - do_custom_cutting (bool, optional): Flag to enable custom cutting. Default is False.
+
+  Returns:
+  Tuple[np.ndarray, pd.DataFrame, List[np.ndarray]]: Tuple containing cut StimVec, cut Stim_df, and cut physRecordingMatrices.
+  """
+    
   cut = len(StimVec)
   if do_custom_cutting:
     plt.plot(np.mean(physRecordingMatrices[0],axis = 0))
