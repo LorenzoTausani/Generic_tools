@@ -181,7 +181,7 @@ class stimulation_data:
         Returns:
         Dict[str, Any]: Dictionary containing mean and SEM values for each stimulus type.
         """
-        session_name = os.path.basename(self.path); logical_dict = self.logical_dict
+        session_name = os.path.basename(self.path); logical_dict = self.logical_dict[n_it]
         #phys_recording_type can be set to F, Fneu, F_neuSubtract, DF_F, DF_F_zscored
         Mean_SEM_dict_filename = session_name+phys_recording_type+'_Mean_SEM_dict.npz'
         if not(os.path.isfile(Mean_SEM_dict_filename)) or change_existing_dict_files==True:
