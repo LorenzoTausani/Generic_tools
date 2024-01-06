@@ -151,7 +151,7 @@ class stimulation_data:
       Returns:
       np.ndarray: Array containing the stimulus' physiological recordings.
       """
-      stimTrue_begin_end = self.logical_dict[idx_logical_dict][stim_name], stim_durations = stimTrue_begin_end[:, 1] - stimTrue_begin_end[:, 0]
+      stimTrue_begin_end = self.logical_dict[idx_logical_dict][stim_name]; stim_durations = stimTrue_begin_end[:, 1] - stimTrue_begin_end[:, 0]
       if correct_stim_duration == 'mode':
         correct_stim_duration = int(mode(stim_durations)[0]) #si assume che la moda delle durate sia la durata normale dello stimolo
       else:
