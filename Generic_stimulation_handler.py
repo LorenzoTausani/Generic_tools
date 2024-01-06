@@ -189,7 +189,11 @@ class stimulation_data:
             for key in logical_dict.keys():
               stim_phys_recordings = self.get_stim_phys_recording(key, phys_recording, correct_stim_duration = 'mode', idx_logical_dict=n_it)
               mean_betw_cells = np.mean(stim_phys_recordings, axis = 1)
-              Mean = np.mean(mean_betw_cells, axis=0); SEM = SEMf(mean_betw_cells)
+              Mean = np.mean(mean_betw_cells, axis=0)
+              if stim_phys_recordings.shape[0]==1:
+                SEM = SEMf(stim_phys_recordings[0,:,:])
+              else:
+                SEM = SEMf(mean_betw_cells)
               Mean_SEM_dict[key] = np.column_stack((Mean, SEM))
             np.savez(Mean_SEM_dict_filename, **Mean_SEM_dict)
         else:
