@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from Generic_foldering_operations import *
 from Generic_string_operations import *
-
+from Generic_numeric_operations import *
 
 class stimulation_data:
     def __init__(self, path: str, Stim_var: str = 'Orientamenti', Time_var: str = 'N_frames'):
@@ -165,6 +165,36 @@ class stimulation_data:
         if is_duration_correct and is_phys_registered:
            stim_phys_recordings[i,:,:] = phys_recording[:,Sev_begin:Sev_begin+correct_stim_duration]
       return stim_phys_recordings
+    
+    def get_stims_mean_sem(self, phys_recording: np.ndarray, n_it: int =0, phys_recording_type: str = 'F', 
+                      change_existing_dict_files: bool=True) -> Dict[str, Any]:
+        
+        """
+        Calculate mean and SEM for each stimulus type and save the results.
+
+        Parameters:
+        - phys_recording (np.ndarray): Array of physiological recordings.
+        - n_it (int, optional): Index specifying which logical dictionary to use. Default is 0.
+        - phys_recording_type (str, optional): Type of physiological recording. Default is 'F' (i.e. fluorescence 2p).
+        - change_existing_dict_files (bool, optional): Flag to change existing dictionary files. Default is True.
+
+        Returns:
+        Dict[str, Any]: Dictionary containing mean and SEM values for each stimulus type.
+        """
+        session_name = os.path.basename(self.path); logical_dict = self.logical_dict
+        #phys_recording_type can be set to F, Fneu, F_neuSubtract, DF_F, DF_F_zscored
+        Mean_SEM_dict_filename = session_name+phys_recording_type+'_Mean_SEM_dict.npz'
+        if not(os.path.isfile(Mean_SEM_dict_filename)) or change_existing_dict_files==True:
+            Mean_SEM_dict = {}
+            for key in logical_dict.keys():
+              stim_phys_recordings = self.get_stim_phys_recording(key, phys_recording, correct_stim_duration = 'mode', idx_logical_dict=n_it)
+              mean_betw_cells = np.mean(stim_phys_recordings, axis = 1)
+              Mean = np.mean(mean_betw_cells, axis=0); SEM = SEMf(mean_betw_cells)
+              Mean_SEM_dict[key] = np.column_stack((Mean, SEM))
+            np.savez(Mean_SEM_dict_filename, **Mean_SEM_dict)
+        else:
+            Mean_SEM_dict = np.load(Mean_SEM_dict_filename)
+        return Mean_SEM_dict
 
 def cut_recording(StimVec: np.ndarray,Stim_df: pd.DataFrame, physRecordingMatrices: List[np.ndarray], df_Time_var: str, 
                   do_custom_cutting: Optional[bool] = False) -> Tuple[np.ndarray, pd.DataFrame, List[np.ndarray]]:
