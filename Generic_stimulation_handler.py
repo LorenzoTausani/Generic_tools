@@ -9,7 +9,7 @@ from Generic_string_operations import *
 from Generic_numeric_operations import *
 
 class stimulation_data:
-    def __init__(self, path: str, Stim_var: str = 'Orientamenti', Time_var: str = 'N_frames'):
+    def __init__(self, path: str, Stim_var: str = 'Orientamenti', Time_var: str = 'N_frames', phys_recording_type: str = 'F', correct_stim_duration: Union[str, int] = 'mode'):
 
         """
         Classe per gestire i dati di stimolazione da file Excel.
@@ -18,11 +18,16 @@ class stimulation_data:
         - path (str): Percorso della directory contenente i file Excel.
         - Stim_var (str): Nome della colonna che contiene il tipo di stimolo.
         - Time_var (str): Nome della colonna che contiene il tempo dell'onset di stimolo.
+        - phys_recording_type (str, optional): Type of physiological recording. Default is 'F' (i.e. fluorescence 2p).
+        - correct_stim_duration (Union[str, int], optional):
+          The desired duration of the stimulus. 'mode' to use mode of durations, or an integer value. Default is 'mode'.
         """
         
         self.path = path
         self.Stim_var = Stim_var
         self.Time_var = Time_var
+        self.correct_stim_duration = correct_stim_duration #da riflettere se mantenere nell'inizializzazione o in metodi successivi
+        self.phys_recording_type = phys_recording_type
 
     def Stim_var_rename(self, stimulation_df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -136,15 +141,13 @@ class stimulation_data:
       return logical_dict 
     
 
-    def get_stim_phys_recording(self, stim_name: str, phys_recording: np.ndarray, correct_stim_duration: Union[str, int] = 'mode', idx_logical_dict: int = 0) -> np.ndarray:
+    def get_stim_phys_recording(self, stim_name: str, phys_recording: np.ndarray, idx_logical_dict: int = 0) -> np.ndarray:
       """
       Retrieves the physiological recordings corresponding to each occurrence of a stimulus.
 
       Parameters:
       - stim_name (str): The name of the stimulus.
       - phys_recording (np.ndarray): Array of physiological recordings.
-      - correct_stim_duration (Union[str, int], optional):
-          The desired duration of the stimulus. 'mode' to use mode of durations, or an integer value. Default is 'mode'.
       - idx_logical_dict (int, optional):
         useful in case of multiple logical dicts present. Set to 0 for single sessions
 
@@ -152,6 +155,7 @@ class stimulation_data:
       np.ndarray: Array containing the stimulus' physiological recordings.
       """
       stimTrue_begin_end = self.logical_dict[idx_logical_dict][stim_name]; stim_durations = stimTrue_begin_end[:, 1] - stimTrue_begin_end[:, 0]
+      correct_stim_duration = self.correct_stim_duration
       if correct_stim_duration == 'mode':
         correct_stim_duration = int(mode(stim_durations)[0]) #si assume che la moda delle durate sia la durata normale dello stimolo
       else:
@@ -166,40 +170,45 @@ class stimulation_data:
            stim_phys_recordings[i,:,:] = phys_recording[:,Sev_begin:Sev_begin+correct_stim_duration]
       return stim_phys_recordings
     
-    def get_stims_mean_sem(self, phys_recording: np.ndarray, n_it: int =0, phys_recording_type: str = 'F', 
-                      change_existing_dict_files: bool=True) -> Dict[str, Any]:
-        
-        """
-        Calculate mean and SEM for each stimulus type and save the results.
+    def get_stats(self, phys_recording: np.ndarray, functions_to_apply, n_it: int =0,change_existing_dict_files: bool=True):
+       results = []
+       for fun in functions_to_apply:
+          results.append(fun(self,phys_recording,n_it,change_existing_dict_files))
+       return results
 
-        Parameters:
-        - phys_recording (np.ndarray): Array of physiological recordings.
-        - n_it (int, optional): Index specifying which logical dictionary to use. Default is 0.
-        - phys_recording_type (str, optional): Type of physiological recording. Default is 'F' (i.e. fluorescence 2p).
-        - change_existing_dict_files (bool, optional): Flag to change existing dictionary files. Default is True.
 
-        Returns:
-        Dict[str, Any]: Dictionary containing mean and SEM values for each stimulus type.
-        """
-        session_name = os.path.basename(self.path); logical_dict = self.logical_dict[n_it]
-        #phys_recording_type can be set to F, Fneu, F_neuSubtract, DF_F, DF_F_zscored
-        Mean_SEM_dict_filename = session_name+phys_recording_type+'_Mean_SEM_dict.npz'
-        if not(os.path.isfile(Mean_SEM_dict_filename)) or change_existing_dict_files==True:
-            Mean_SEM_dict = {}
-            for key in logical_dict.keys():
-              stim_phys_recordings = self.get_stim_phys_recording(key, phys_recording, correct_stim_duration = 'mode', idx_logical_dict=n_it)
-              mean_betw_cells = np.mean(stim_phys_recordings, axis = 1)
-              Mean = np.mean(mean_betw_cells, axis=0)
-              if stim_phys_recordings.shape[0]==1:
-                SEM = SEMf(stim_phys_recordings[0,:,:]) #sem between cells for stimuli that are presented only once
-              else:
-                SEM = SEMf(mean_betw_cells)
-              Mean_SEM_dict[key] = np.column_stack((Mean, SEM))
-            np.savez(Mean_SEM_dict_filename, **Mean_SEM_dict)
-        else:
-            Mean_SEM_dict = np.load(Mean_SEM_dict_filename)
-        return Mean_SEM_dict
+def get_stims_mean_sem(stimulation_data_obj, phys_recording: np.ndarray, n_it: int =0, change_existing_dict_files: bool=True) -> Dict[str, Any]:
+    """
+    Calculate mean and SEM for each stimulus type and save the results.
 
+    Parameters:
+    - stimulation_data_obj: instance of the stimulation_data class
+    - phys_recording (np.ndarray): Array of physiological recordings.
+    - n_it (int, optional): Index specifying which logical dictionary to use. Default is 0.
+    - change_existing_dict_files (bool, optional): Flag to change existing dictionary files. Default is True.
+
+    Returns:
+    Dict[str, Any]: Dictionary containing mean and SEM values for each stimulus type.
+    """
+    session_name = os.path.basename(stimulation_data_obj.path); logical_dict = stimulation_data_obj.logical_dict[n_it]; phys_recording_type = stimulation_data_obj.phys_recording_type
+    #phys_recording_type can be set to F, Fneu, F_neuSubtract, DF_F, DF_F_zscored
+    Mean_SEM_dict_filename = session_name+phys_recording_type+'_Mean_SEM_dict.npz'
+    if not(os.path.isfile(Mean_SEM_dict_filename)) or change_existing_dict_files==True:
+        Mean_SEM_dict = {}
+        for key in logical_dict.keys():
+          stim_phys_recordings = stimulation_data_obj.get_stim_phys_recording(key, phys_recording, idx_logical_dict=n_it)
+          mean_betw_cells = np.mean(stim_phys_recordings, axis = 1)
+          Mean = np.mean(mean_betw_cells, axis=0)
+          if stim_phys_recordings.shape[0]==1:
+            SEM = SEMf(stim_phys_recordings[0,:,:]) #sem between cells for stimuli that are presented only once
+          else:
+            SEM = SEMf(mean_betw_cells)
+          Mean_SEM_dict[key] = np.column_stack((Mean, SEM))
+        np.savez(Mean_SEM_dict_filename, **Mean_SEM_dict)
+    else:
+        Mean_SEM_dict = np.load(Mean_SEM_dict_filename)
+    return Mean_SEM_dict
+    
 def cut_recording(StimVec: np.ndarray,Stim_df: pd.DataFrame, physRecordingMatrices: List[np.ndarray], df_Time_var: str, 
                   do_custom_cutting: Optional[bool] = False) -> Tuple[np.ndarray, pd.DataFrame, List[np.ndarray]]:
   """
