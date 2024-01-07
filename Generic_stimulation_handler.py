@@ -191,7 +191,7 @@ class stimulation_data:
               mean_betw_cells = np.mean(stim_phys_recordings, axis = 1)
               Mean = np.mean(mean_betw_cells, axis=0)
               if stim_phys_recordings.shape[0]==1:
-                SEM = SEMf(stim_phys_recordings[0,:,:])
+                SEM = SEMf(stim_phys_recordings[0,:,:]) #sem between cells for stimuli that are presented only once
               else:
                 SEM = SEMf(mean_betw_cells)
               Mean_SEM_dict[key] = np.column_stack((Mean, SEM))
