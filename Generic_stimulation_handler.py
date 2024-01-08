@@ -141,7 +141,7 @@ class stimulation_data:
       return logical_dict 
     
 
-    def get_stim_phys_recording(self, stim_name: str, phys_recording: np.ndarray, idx_logical_dict: int = 0, get_pre_stim: bool = False) -> np.ndarray:
+    def get_stim_phys_recording(self, stim_name: str, phys_recording: np.ndarray, idx_logical_dict: int = 0, get_pre_stim: bool = False, correct_stim_duration: int = 0) -> np.ndarray:
       """
       Retrieves the physiological recordings corresponding to each occurrence of a stimulus.
 
@@ -155,11 +155,12 @@ class stimulation_data:
       np.ndarray: Array containing the stimulus' physiological recordings.
       """
       stimTrue_begin_end = self.logical_dict[idx_logical_dict][stim_name]; stim_durations = stimTrue_begin_end[:, 1] - stimTrue_begin_end[:, 0]
-      correct_stim_duration = self.correct_stim_duration
-      if correct_stim_duration == 'mode':
-        correct_stim_duration = int(mode(stim_durations)[0]) #si assume che la moda delle durate sia la durata normale dello stimolo
-      else:
-        correct_stim_duration = int(correct_stim_duration) 
+      if correct_stim_duration == 0:
+        correct_stim_duration = self.correct_stim_duration
+        if correct_stim_duration == 'mode':
+          correct_stim_duration = int(mode(stim_durations)[0]) #si assume che la moda delle durate sia la durata normale dello stimolo
+        else:
+          correct_stim_duration = int(correct_stim_duration) 
         
       stim_phys_recordings = np.full((stimTrue_begin_end.shape[0], phys_recording.shape[0],correct_stim_duration), np.nan)
       for i, stim_event_beg_end in enumerate(stimTrue_begin_end):
