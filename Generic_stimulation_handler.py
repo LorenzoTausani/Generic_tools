@@ -165,7 +165,7 @@ class stimulation_data:
       stim_phys_recordings = np.full((stimTrue_begin_end.shape[0], phys_recording.shape[0],correct_stim_duration), np.nan)
       for i, stim_event_beg_end in enumerate(stimTrue_begin_end):
         Sev_begin = stim_event_beg_end[0]
-        is_duration_correct = np.abs(stim_durations[i]-correct_stim_duration)< correct_stim_duration/10 #criterio arbitrario
+        is_duration_correct = np.abs(stim_durations[i]-int(mode(stim_durations)[0]))< int(mode(stim_durations)[0])/10 #criterio arbitrario
         is_phys_registered = phys_recording.shape[1] >= stimTrue_begin_end[i, 1] #l'evento è stato registrato per intero fisiologicamente
         if is_duration_correct and is_phys_registered:
            if get_pre_stim:
