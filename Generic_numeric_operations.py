@@ -1,6 +1,8 @@
 from typing import Union, List, Tuple
 from Generic_converters import *
 import numpy as np
+import torch
+import pandas as pd
 
 def SEMf(data: Union[List[float], Tuple[float], np.ndarray], axis: int = 0) -> float:
     """
@@ -28,3 +30,18 @@ def SEMf(data: Union[List[float], Tuple[float], np.ndarray], axis: int = 0) -> f
     except Exception as e:
         print(f"Errore durante il calcolo dello standard error of the mean (SEM): {e}")
         return None
+    
+
+def perc_difference(array1: Union[List[float], np.ndarray, torch.Tensor, pd.DataFrame], array2: Union[List[float], np.ndarray, torch.Tensor, pd.DataFrame]) -> np.ndarray:
+    """
+    Calcola la differenza percentuale tra due array.
+
+    Parameters:
+    - array1 (Union[List[float], np.ndarray, torch.Tensor, pd.DataFrame]): Primo array di input.
+    - array2 (Union[List[float], np.ndarray, torch.Tensor, pd.DataFrame]): Secondo array di input.
+
+    Returns:
+    - P_diff (np.ndarray): Array delle differenze percentuali.
+    """
+    array1 = convert_to_numpy(array1); array2 = convert_to_numpy(array2)
+    return ((array1-array2)/array2)*100
