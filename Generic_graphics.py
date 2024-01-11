@@ -14,9 +14,9 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
     """
     if shape == 'square':
         other_side = side
-    elif shape == 'rect_tall':
-        other_side = int(side * (2/3))
     elif shape == 'rect_wide':
+        other_side = int(side * (2/3))
+    elif shape == 'rect_tall':
         other_side = int(side * (3/2))
     else:
         raise ValueError("Invalid shape. Use 'square', 'rect_tall', or 'rect_wide'.")
@@ -36,7 +36,7 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
         'xtick.major.pad': 5,
         'ytick.major.pad': 5,
         'errorbar.capsize': 4,
-        'errorbar.elinewidth': 5
+        #'errorbar.elinewidth': 5 da correggere
     }
 
     plt.rcParams.update(params)
