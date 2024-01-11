@@ -60,7 +60,7 @@ def custom_boxplot(df: pd.DataFrame,
                    xlbl: str = 'Condition',
                    ylbl: str = 'Fluorescence',
                    test2: bool = True,
-                   omitplot: bool = True,
+                   omitplot: bool = False,
                    title: str = '') -> None:
     """
     Crea un boxplot per un DataFrame con la possibilità di aggiungere test statistici tra le colonne.
