@@ -39,6 +39,20 @@ def exclude_chars(string: str, pattern: str) -> str:
     """
     return re.sub(pattern, '', string)
 
+def substitute_character(input_string: str, old_char: str, new_char: str) -> str:
+    """
+    Substitute a particular character in a string with another character.
+
+    Parameters:
+    - input_string (str): The input string.
+    - old_char (str): The character to be replaced.
+    - new_char (str): The character to replace old_char.
+
+    Returns:
+    - str: The modified string.
+    """
+    return re.sub(re.escape(old_char), new_char, input_string) #non chiarissimo il ruolo di re.escape()
+
 
 def standard_format_string(input_string: str) -> str:
     """
