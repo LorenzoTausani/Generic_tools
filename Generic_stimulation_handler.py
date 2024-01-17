@@ -92,6 +92,7 @@ class stimulation_data:
         """
 
         excel_files = find_files_by_extension(directory = self.path, extension='.xlsx', recursive = False)
+        session_names = [os.path.splitext(os.path.basename(file_path))[0] for file_path in excel_files] #os.path.splitext(os.path.basename(file_path))[0] prendo solo il root, perdendo la extension
         Stim_dfs = []
         StimVecs = []
         for n,ex_f in enumerate(excel_files): #multipli file excel sono considerati in caso di trattamento nella stessa sessione sperimentale (pre-post treatment). L'ordinamento di questi files va sviluppato
@@ -102,7 +103,8 @@ class stimulation_data:
         self.Stim_dfs = Stim_dfs
         self.StimVecs = StimVecs
         self.len_phys_recordings = len_phys_recordings
-        return Stim_dfs, StimVecs, len_phys_recordings
+        self.session_names = session_names
+        return Stim_dfs, StimVecs, len_phys_recordings, session_names
     
     def create_logical_dict(self, idx: int, change_existing_dict_files: bool=True)-> Dict[str, Any]: #mettere anche *args e **kwargs?
       """
