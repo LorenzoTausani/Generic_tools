@@ -147,7 +147,8 @@ def paired_boxplot(df_pre: pd.DataFrame, df_post: pd.DataFrame, vars_of_interest
     - None
     """
     #some graphic settings
-    grouping_name = 'Treatment'; x_lbl = 'Metric'; palette = [Pre_Post_lbls['Pre'], Pre_Post_lbls['Post']]
+    PP_keys = [k for k in Pre_Post_lbls.keys()]
+    grouping_name = 'Treatment'; x_lbl = 'Metric'; palette = [Pre_Post_lbls[PP_keys[0]], Pre_Post_lbls[PP_keys[1]]]
     _,sns_params = set_default_matplotlib_params(sns_params=True)
     #combining data in a single dataframe
     pre = df_pre[vars_of_interest]; post = df_post[vars_of_interest]; Pre_Post_keys = [key for key in Pre_Post_lbls]
