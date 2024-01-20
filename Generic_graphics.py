@@ -132,7 +132,7 @@ def custom_boxplot(df: pd.DataFrame,
 
 def paired_boxplot(df_pre: pd.DataFrame, df_post: pd.DataFrame, vars_of_interest: List[str],
                    Pre_Post_lbls: Dict[str, str] = {'Pre': 'green', 'Post': 'purple'},
-                   y_lim: Optional[List[float]] = None) -> None:
+                   y_lim : Optional[List[float]] = []) -> None:
     """
     Create a paired boxplot comparing two dataframes for the variables vars_of_interest.
 
