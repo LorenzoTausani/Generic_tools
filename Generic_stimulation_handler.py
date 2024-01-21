@@ -143,7 +143,7 @@ class stimulation_data:
       return logical_dict 
     
 
-    def get_stim_phys_recording(self, stim_name: str, phys_recording: np.ndarray, idx_logical_dict: int = 0, get_pre_stim: bool = False, correct_stim_duration: int = 0) -> np.ndarray:
+    def get_stim_phys_recording(self, stim_name: str, phys_recording: np.ndarray, idx_logical_dict: int = 0, get_pre_stim: bool = False, correct_stim_duration: int = 0, latency=0) -> np.ndarray:
       """
       Retrieves the physiological recordings corresponding to each occurrence of a stimulus.
 
@@ -171,8 +171,10 @@ class stimulation_data:
         is_phys_registered = phys_recording.shape[1] >= stimTrue_begin_end[i, 1] #l'evento è stato registrato per intero fisiologicamente
         if is_duration_correct and is_phys_registered:
            if get_pre_stim:
+              Sev_begin = Sev_begin-latency
               stim_phys_recordings[i,:,:] = phys_recording[:,Sev_begin-correct_stim_duration:Sev_begin]
            else:
+            Sev_begin = Sev_begin+latency
             stim_phys_recordings[i,:,:] = phys_recording[:,Sev_begin:Sev_begin+correct_stim_duration]
       return stim_phys_recordings
     
