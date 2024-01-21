@@ -15,15 +15,19 @@ def extract_numbers(input_string: str) -> str:
 
 def contains_character(s: str, pattern: str) -> bool:
     """
-    Check if the given string contains at least one character that matches the specified pattern.
+    Check if the given string contains at least one character that matches any of the specified patterns.
 
     Parameters:
     - s (str): The input string to check.
-    - pattern (str): The pattern of characters to look for.
+    - pattern (str or list): The pattern or list of characters to look for.
 
     Returns:
-    - bool: True if the string contains at least one character matching the specified pattern, False otherwise.
+    - bool: True if the string contains at least one character matching any of the specified patterns, False otherwise.
     """
+    if isinstance(pattern, list):
+        # If pattern is a list, join the characters with '|' for the regex
+        pattern = '|'.join(re.escape(char) for char in pattern)
+
     return bool(re.search(pattern, s))
 
 def exclude_chars(string: str, pattern: str) -> str:
