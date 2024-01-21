@@ -82,7 +82,7 @@ def draw_2test_lines(results: Dict[str, float], col_idxs: List[float], y_positio
     font_size = plt.rcParams['xtick.labelsize'] / 3.0 #compute the fontsize to be used for the p-value
     plt.text(x_position, y_position + next_segment/3, "p = {:.2e}".format(results["p_value"]),
             ha='center', va='center', fontsize=font_size) #add the p-value text above the significance segment
-    return y_position
+  return y_position
 
 def custom_boxplot(df: pd.DataFrame,
                    selected_columns: List[str],
