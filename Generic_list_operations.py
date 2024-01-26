@@ -1,4 +1,4 @@
-from typing import List, Callable, Any, Union
+from typing import List, Callable, Any, Union, Dict
 
 def filter_list(input_list: List[Any], condition_func: Callable[[Any], bool]) -> List[Any]:
     """
@@ -39,3 +39,24 @@ def multioption_prompt(opt_list: List[str], in_prompt: str) -> Union[str, List[s
         answer = opt_list[idx_answer]
 
     return answer
+
+
+def create_variable_dict(locals_or_globals: Dict, variables_list: list) -> Dict:
+    """
+    Create a dictionary associating each variable name to the variable in the local or global namespace.
+
+    Parameters:
+    - locals_or_globals: Dictionary-like object representing local or global namespace.
+    - variables_list: List of variable names.
+
+    Returns:
+    A dictionary where keys are variable names and values are the corresponding variables.
+    """
+    variable_dict = {}
+    for var in variables_list:
+        if var in locals_or_globals:
+            variable_dict[var] = locals_or_globals[var]
+        else:
+            print('\033[1mVariable {} not found\033[0m'.format(var))
+
+    return variable_dict
