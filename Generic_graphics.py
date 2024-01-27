@@ -16,7 +16,7 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
     - shape: Shape of the figure ('square', 'rect_tall', or 'rect_wide', default is 'square').
 
     Returns:
-    - None
+    - graphic parameters (params + sns_params_dict if sns_params=True)
     """
     if shape == 'square':
         other_side = side
@@ -26,7 +26,7 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
         other_side = int(side * (3/2))
     else:
         raise ValueError("Invalid shape. Use 'square', 'rect_tall', or 'rect_wide'.")
-    writing_sz = 50; standard_lw = 4
+    writing_sz = 50; standard_lw = 4; marker_sz = 20
     box_lw = 3; box_c = 'black'; median_lw = 4; median_c = 'red'
     params = {
         'figure.figsize': (side, other_side),
@@ -39,7 +39,8 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
         'axes.grid': False,
         'grid.alpha': 0.5,
         'lines.linewidth': standard_lw,
-        'lines.markersize': 12,
+        'lines.markersize': marker_sz,
+        'lines.marker': '.',
         'xtick.major.pad': 5,
         'ytick.major.pad': 5,
         'errorbar.capsize': standard_lw,
