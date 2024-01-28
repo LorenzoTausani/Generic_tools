@@ -1,8 +1,10 @@
-from typing import Union, List, Tuple
+from typing import Union, List, Tuple, Callable,Dict
 from Generic_converters import *
 import numpy as np
 import torch
 import pandas as pd
+from itertools import combinations
+
 
 def SEMf(data: Union[List[float], Tuple[float], np.ndarray], axis: int = 0) -> float:
     """
@@ -45,3 +47,47 @@ def perc_difference(array1: Union[List[float], np.ndarray, torch.Tensor, pd.Data
     """
     array1 = convert_to_numpy(array1); array2 = convert_to_numpy(array2)
     return ((array1-array2)/array2)*100
+
+
+def site_to_site_correlations(stim_data, phys_recording: np.ndarray, stimuli_of_interest : List[str], get_key_f: Callable[[Dict], List[str]],cells_of_interest: Union[List[int], np.ndarray] = [], n_it: int = 0) -> pd.DataFrame:
+    """
+    Calculate site-to-site correlations for a given set of stimuli.
+
+    Parameters:
+        stim_data: Stimulus data.
+        phys_recording: Physiological recording data (cell x time).
+        stimuli_of_interest: List of stimuli to analyze.
+        cells_of_interest: List of cells to analyze.
+        n_it: Index of the logical dictionary.
+
+    Returns:
+        pd.DataFrame: DataFrame containing site-to-site correlations.
+    """
+    if cells_of_interest == []: #if no cell is selected, then select them all
+        cells_of_interest = np.arange(phys_recording.shape[0])
+    else:
+        cells_of_interest = np.sort(convert_to_numpy(cells_of_interest)) #otherwise, i sort the cells selected
+
+    corr_site_couples = list(combinations(cells_of_interest, 2)); corr_df = pd.DataFrame({'Cell IDs': corr_site_couples}) #list all possible combinations between sites
+
+    for stimulus in stimuli_of_interest: #for every stimulus listed...
+        if stimulus == 'all': #if you want to see the correlation of all the trace, irrespective of timestamps...
+            stim_avg_per_cell = phys_recording[cells_of_interest, :]
+        else:
+            if stimulus == 'stimuli' or stimulus == 'intertrial': #if you want to see the correlation among all stimuli, irrespective of their identity (or for their intertrials)...
+                key_set, _ = get_key_f(stim_data.logical_dict[0])
+                if stimulus == 'intertrial': 
+                    key_set = ['gray ' + k for k in key_set]
+                list_recs = [stim_data.get_stim_phys_recording(st, phys_recording, idx_logical_dict=n_it) for st in key_set]
+                stimulus_phys_recording = np.concatenate(list_recs, axis=0)
+            else: #if you want to see the correlation only for one specific type of stimulus...
+                stimulus_phys_recording = stim_data.get_stim_phys_recording(stimulus, phys_recording, idx_logical_dict=n_it) #metti la possibilità di regolare durata stimolo?
+            selected_stim_recs = stimulus_phys_recording[:, cells_of_interest, :]
+            stim_avg_per_cell = np.mean(selected_stim_recs, axis=0)
+
+        correlation_matrix = np.corrcoef(stim_avg_per_cell)
+        upper_triangle_indices = np.triu_indices(correlation_matrix.shape[0], k=1)
+        upper_triangle_corrs = correlation_matrix[upper_triangle_indices]
+        corr_df['Correlation-' + stimulus] = upper_triangle_corrs
+
+    return corr_df
