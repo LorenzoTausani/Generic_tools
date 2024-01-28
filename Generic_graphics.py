@@ -4,8 +4,10 @@ from scipy.special import comb
 import numpy as np
 import pandas as pd
 from typing import Literal,Union, List
+from matplotlib.axes import Axes
 
 from Generic_stats import *
+from Generic_numeric_operations import *
 
 def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 'rect_tall', 'rect_wide'] = 'square', sns_params=False) -> None:
     """
@@ -39,8 +41,8 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
         'axes.grid': False,
         'grid.alpha': 0.5,
         'lines.linewidth': standard_lw,
+        'lines.linestyle': '-',
         'lines.markersize': marker_sz,
-        'lines.marker': '.',
         'xtick.major.pad': 5,
         'ytick.major.pad': 5,
         'errorbar.capsize': standard_lw,
@@ -177,6 +179,81 @@ def paired_boxplot(df_pre: pd.DataFrame, df_post: pd.DataFrame, vars_of_interest
         y_position = draw_2test_lines(results,col_idxs, y_position, next_segment)
         col_idxs = [c+1 for c in col_idxs]
     plt.show()
+
+
+def plot_mean_pm_sem(data: np.ndarray, ax: Axes = None, color: str = 'red') -> tuple[np.ndarray, np.ndarray]:
+    """
+    Plot the mean +/- standard error of the mean (SEM) of the given data.
+
+    Parameters:
+        data (np.ndarray): The input data as a numpy array.
+        ax (Axes, optional): The axis to plot on. If None, a new figure is created. Defaults to None.
+        color (str, optional): The color of the plot. Defaults to 'red'.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: A tuple containing the mean and SEM arrays.
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+    params = set_default_matplotlib_params(side=15, shape='rect_wide')
+
+    mean = np.mean(data, axis=0); sem = SEMf(data, axis=0)
+    upper_bound = mean + sem; lower_bound = mean - sem
+
+    ax.plot(mean, color=color)
+    ax.fill_between(range(len(mean)), lower_bound, upper_bound, color=color, alpha=0.2)
+
+    if ax is None:
+        plt.show()
+    
+    return mean, sem
+
+
+def plot_PSTH(stim_data, phys_recording, stimuli_of_interest: np.ndarray, cells_of_interest: np.ndarray, n_it: int = 0, time_stim: int = 150, time_prestim: int = 150, ylbl: str = 'Fluorescence', xlbl: str = 'time(frames)') -> np.ndarray:
+    """
+    Plot the Peri-Stimulus Time Histogram (PSTH) for a given physiological recording over a set of stimuli.
+
+    Parameters:
+        stim_data: The stimulus data object.
+        phys_recording: The physiological recording data.
+        stimuli_of_interest: The list of stimuli of interest.
+        cells_of_interest: The indices of cells of interest.
+        n_it: The index for logical dictionary. Defaults to 0.
+        time_stim: The duration of the stimulus. Defaults to 150.
+        time_prestim: The duration of the pre-stimulus. Defaults to 150.
+        ylbl: y label
+        xlbl: x label
+
+    Returns:
+        np.ndarray: The concatenated pre-post stimulus data.
+    """
+    params = set_default_matplotlib_params(side=15, shape='rect_wide'); subplots_nr = len(stimuli_of_interest)
+    _, axes = plt.subplots(subplots_nr, 1, figsize=(params['figure.figsize'][0], params['figure.figsize'][1] * subplots_nr))  # Create subplot grid
+
+    for i, stimulus in enumerate(stimuli_of_interest):
+        #selection of stimulus-related data
+        stimulus_phys_recording = stim_data.get_stim_phys_recording(stimulus, phys_recording, idx_logical_dict=n_it, correct_stim_duration=time_stim)
+        selected_stim_recs = stimulus_phys_recording[:, cells_of_interest, :]
+        if not(isinstance(cells_of_interest, int)):
+            selected_stim_recs = selected_stim_recs.reshape(-1, selected_stim_recs.shape[-1])
+
+        if time_prestim > 0: #If requested, selection of period preceding the stimulus
+            pre_phys_recordings = stim_data.get_stim_phys_recording(stimulus, phys_recording, idx_logical_dict=n_it, get_pre_stim=True, correct_stim_duration=time_prestim)
+            selected_pre_recs = pre_phys_recordings[:, cells_of_interest, :]
+            if not(isinstance(cells_of_interest, int)):
+                selected_pre_recs = selected_pre_recs.reshape(-1, selected_pre_recs.shape[-1])
+            pre_post_stim = np.hstack((selected_pre_recs, selected_stim_recs))
+            stim_onset = selected_pre_recs.shape[-1]; axes[i].axvline(x=stim_onset, color='green', linestyle='--') #line indicating stimulus onset
+        else:
+            pre_post_stim = selected_stim_recs
+
+        plot_mean_pm_sem(pre_post_stim, ax=axes[i])
+        axes[i].set_title(stimulus); axes[i].set_xlabel(xlbl); axes[i].set_ylabel(ylbl)
+
+    plt.tight_layout()
+    plt.show()
+
+    return pre_post_stim
 
 
 
