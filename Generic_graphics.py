@@ -9,7 +9,28 @@ from matplotlib.axes import Axes
 from Generic_stats import *
 from Generic_numeric_operations import *
 
-def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 'rect_tall', 'rect_wide'] = 'square', sns_params=False) -> None:
+
+def Get_appropriate_fontsz(labels: List[str], figure_width: Union[float, int] = 0) -> float:
+    """
+    Calculate the appropriate fontsize for xticks (TO BE UPDATED FOR ALL) dynamically based on the number of labels and figure width.
+
+    Parameters:
+        labels (List[str]): List of label strings.
+        figure_width (Union[float, int]): Width of the figure in inches. If 0, uses the default figure width.
+
+    Returns:
+        float: The calculated fontsize for xticks.
+    """
+    nr_labels = len(labels)
+    max_label_length = max(len(label) for label in labels)
+    if figure_width == 0:
+        figure_width = plt.rcParams['figure.figsize'][0]
+    Fontsz = ((figure_width / nr_labels) / max_label_length) / 0.0085 #0.0085 found empirically
+    print('Best fontsize avoiding overlapping: '+str(Fontsz))
+    return Fontsz
+
+
+def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 'rect_tall', 'rect_wide'] = 'square', sns_params=False, xlabels = []) -> None:
     """
     Set default Matplotlib parameters for better visualizations.
 
@@ -30,6 +51,8 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
         raise ValueError("Invalid shape. Use 'square', 'rect_tall', or 'rect_wide'.")
     writing_sz = 50; standard_lw = 4; marker_sz = 20
     box_lw = 3; box_c = 'black'; median_lw = 4; median_c = 'red'
+    if not(xlabels==[]):
+        writing_sz =  Get_appropriate_fontsz(xlabels, figure_width= side)
     params = {
         'figure.figsize': (side, other_side),
         'font.size': writing_sz,
