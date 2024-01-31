@@ -1,5 +1,6 @@
 from typing import Union, List, Tuple, Callable,Dict
 from Generic_converters import *
+from Generic_numpy_operations import *
 import numpy as np
 import torch
 import pandas as pd
@@ -79,7 +80,7 @@ def site_to_site_correlations(stim_data, phys_recording: np.ndarray, stimuli_of_
                 if stimulus == 'intertrial': 
                     key_set = ['gray ' + k for k in key_set]
                 list_recs = [stim_data.get_stim_phys_recording(st, phys_recording, idx_logical_dict=n_it) for st in key_set]
-                stimulus_phys_recording = np.concatenate(list_recs, axis=0)
+                stimulus_phys_recording = np.concatenate(adjust_length_arrays(list_recs, dimensions_to_adjust = 2), axis=0)
             else: #if you want to see the correlation only for one specific type of stimulus...
                 stimulus_phys_recording = stim_data.get_stim_phys_recording(stimulus, phys_recording, idx_logical_dict=n_it) #metti la possibilità di regolare durata stimolo?
             selected_stim_recs = stimulus_phys_recording[:, cells_of_interest, :]
