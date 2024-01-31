@@ -52,7 +52,7 @@ def set_default_matplotlib_params(side: float = 15, shape: Literal['square', 're
     writing_sz = 50; standard_lw = 4; marker_sz = 20
     box_lw = 3; box_c = 'black'; median_lw = 4; median_c = 'red'
     if not(xlabels==[]):
-        writing_sz =  Get_appropriate_fontsz(xlabels, figure_width= side)
+        writing_sz =  min(Get_appropriate_fontsz(xlabels, figure_width= side),writing_sz)
     params = {
         'figure.figsize': (side, other_side),
         'font.size': writing_sz,
