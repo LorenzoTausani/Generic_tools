@@ -113,9 +113,9 @@ def custom_boxplot(df: pd.DataFrame,
     boxplot = plt.boxplot(df[selected_columns], labels=selected_columns)
     plt.xlabel(xlbl)
     plt.ylabel(ylbl)
-    y_position = df.max().max() 
+    y_position = df[selected_columns].max().max() 
     next_segment = 0.1*y_position
-    min_y = df.min().min()-next_segment
+    min_y = df[selected_columns].min().min()-next_segment
     number_of_stat_comps = comb(len(selected_columns), 2)
     y_lim = y_position+(number_of_stat_comps+1)*next_segment
     plt.ylim([min_y,y_lim])
