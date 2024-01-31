@@ -8,6 +8,7 @@ from matplotlib.axes import Axes
 
 from Generic_stats import *
 from Generic_numeric_operations import *
+from Generic_string_operations import *
 
 
 def Get_appropriate_fontsz(labels: List[str], figure_width: Union[float, int] = 0) -> float:
@@ -182,7 +183,14 @@ def paired_boxplot(df_pre: pd.DataFrame, df_post: pd.DataFrame, vars_of_interest
     combined_data = pd.concat([pre, post], ignore_index=True)
     #melted_data is prepared for seaborn-specific processing
     if isinstance(vars_of_interest,list):
+      for delimiter in ['-',' ']:
+        common_words = get_common_words_betw_strings(vars_of_interest, delimiter= delimiter)
+        if not(common_words==[]):
+          break
+      if common_words==[]:
         v_name = '/'.join(vars_of_interest)
+      else:
+        v_name = common_words[0]
     else:
         v_name = vars_of_interest
     melted_data = pd.melt(combined_data, id_vars=[grouping_name], value_vars=vars_of_interest, var_name=x_lbl, value_name=v_name)

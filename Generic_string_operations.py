@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Union, List
 import re
 
 def extract_numbers(input_string: str) -> str:
@@ -72,3 +72,18 @@ def standard_format_string(input_string: str) -> str:
     formatted_words = [word.capitalize() for word in words]
     formatted_string = '_'.join(formatted_words)
     return formatted_string
+
+def get_common_words_betw_strings(list_of_strings: List[str], delimiter: str = '-') -> List[str]:
+    """
+    Extracts common words between strings split by a given delimiter.
+
+    Args:
+    - list_of_strings (List[str]): List of strings to extract common words from.
+    - delimiter (str, optional): Delimiter to split strings. Defaults to '-'.
+
+    Returns:
+    - List[str]: List of common words.
+    """
+    words_list = [s.split(delimiter) for s in list_of_strings]
+    common_words = list(set(words_list[0]).intersection(*words_list[1:]))
+    return common_words
