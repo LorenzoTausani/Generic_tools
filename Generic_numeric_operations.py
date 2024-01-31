@@ -92,3 +92,23 @@ def site_to_site_correlations(stim_data, phys_recording: np.ndarray, stimuli_of_
         corr_df["\u03C1-" + stimulus] = upper_triangle_corrs #"\u03C1" = ρ
 
     return corr_df
+
+def get_indexes_in_combs(corr_df: pd.DataFrame, cell_indices: List[int]) -> List[int]:
+    """
+    Get the indices of elements in the DataFrame 'corr_df' where the 'Cell IDs' contain all integers in 'cell_indices'.
+
+    Args:
+        corr_df (pd.DataFrame): The DataFrame containing the column 'Cell IDs'.
+        cell_indices (List[int]): The list of integers to search for.
+
+    Returns:
+        List[int]: The list of indices containing all integers in 'cell_indices'.
+    """
+    sel_idxs = [] # Initialize an empty list to store indices
+    
+    for idx, val in enumerate(corr_df['Cell IDs']): # Iterate over each element in the Series
+        # Check if all integers in the tuple match those in cell_indices
+        if all(num in cell_indices for num in val):
+            sel_idxs.append(idx) # If match found, append the index to the list
+
+    return sel_idxs
