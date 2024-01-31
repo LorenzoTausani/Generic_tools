@@ -88,6 +88,6 @@ def site_to_site_correlations(stim_data, phys_recording: np.ndarray, stimuli_of_
         correlation_matrix = np.corrcoef(stim_avg_per_cell)
         upper_triangle_indices = np.triu_indices(correlation_matrix.shape[0], k=1)
         upper_triangle_corrs = correlation_matrix[upper_triangle_indices]
-        corr_df['Correlation-' + stimulus] = upper_triangle_corrs
+        corr_df["\u03C1-" + stimulus] = upper_triangle_corrs #"\u03C1" = ρ
 
     return corr_df

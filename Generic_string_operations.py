@@ -87,3 +87,6 @@ def get_common_words_betw_strings(list_of_strings: List[str], delimiter: str = '
     words_list = [s.split(delimiter) for s in list_of_strings]
     common_words = list(set(words_list[0]).intersection(*words_list[1:]))
     return common_words
+
+def italic(string): #check this better
+  return "\x1B[3m"+ string + "\x1B[0m"
