@@ -132,7 +132,7 @@ def custom_boxplot(df: pd.DataFrame,
     Returns:
     - None: La funzione mostra il boxplot o lo salva a seconda dei parametri forniti.
     """
-    set_default_matplotlib_params(side=15, shape='rect_wide')
+    set_default_matplotlib_params(side=15, shape='rect_wide', xlabels = selected_columns)
     boxplot = plt.boxplot(df[selected_columns], labels=selected_columns)
     plt.xlabel(xlbl)
     plt.ylabel(ylbl)
@@ -175,7 +175,7 @@ def paired_boxplot(df_pre: pd.DataFrame, df_post: pd.DataFrame, vars_of_interest
     #some graphic settings
     PP_keys = [k for k in Pre_Post_lbls.keys()]
     grouping_name = 'Treatment'; x_lbl = 'Metric'; palette = [Pre_Post_lbls[PP_keys[0]], Pre_Post_lbls[PP_keys[1]]]
-    _,sns_params = set_default_matplotlib_params(sns_params=True)
+    _,sns_params = set_default_matplotlib_params(sns_params=True, xlabels = vars_of_interest)
     #combining data in a single dataframe
     pre = df_pre[vars_of_interest]; post = df_post[vars_of_interest]; Pre_Post_keys = [key for key in Pre_Post_lbls]
     pre[grouping_name] = Pre_Post_keys[0]; post[grouping_name] = Pre_Post_keys[1]
