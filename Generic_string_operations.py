@@ -90,3 +90,18 @@ def get_common_words_betw_strings(list_of_strings: List[str], delimiter: str = '
 
 def italic(string): #check this better
   return "\x1B[3m"+ string + "\x1B[0m"
+
+def multichar_split(my_string: str, separator_chars: List[str] =['-', '.'])-> List[str]:
+    """
+    Split a string using multiple separator characters.
+
+    Args:
+        my_string (str): The input string to be split.
+        separator_chars (List[str]): List of separator characters. Default is ['-','.'].
+
+    Returns:
+        List[str]: List containing the substrings resulting from the split.
+    """
+    # Build the regular expression pattern to match any of the separator characters
+    pattern = '[' + re.escape(''.join(separator_chars)) + ']'
+    return re.split(pattern, my_string) # Split the string using the pattern as separator

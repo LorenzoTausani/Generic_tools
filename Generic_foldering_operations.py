@@ -2,6 +2,17 @@ from typing import Union, List
 import os
 import shutil
 import glob
+from Generic_downloader import *
+pip_install_library('gitpython')
+import git
+
+def clone_repo_code(gituser='LorenzoTausani', repo_name='XDREAM_custom_LT'):
+    repo_address = f'https://github.com/{gituser}/{repo_name}.git'
+    try:
+        git.Repo.clone_from(repo_address, f'./{repo_name}')
+        print(repo_name+" cloned successfully!")
+    except git.exc.GitCommandError as e:
+        print(f"Failed to clone repository {repo_name}: {e}")
 
 def remove_dirs(root: str, folders_to_remove: Union[str, List[str]]) -> None:
     """
@@ -40,4 +51,5 @@ def find_files_by_extension(directory: str, extension: str, recursive: bool = Fa
 
     files = glob.glob(pattern, recursive=recursive)
     return files
+
 
